@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 // Твоя проверенная строка подключения
-const mongoURI = "mongodb+srv://admin:pass12345@cluster0.yxx1kto.mongodb.net/familyDB?retryWrites=true&w=majority";
+const mongoURI = "mongodb+srv://dragon777:Dragon2026Strong@cluster0.yxx1kto.mongodb.net/familyDB?retryWrites=true&w=majority";
 console.log("⏳ Пытаюсь подключиться к MongoDB...");
 
 mongoose.connect(mongoURI)
@@ -81,3 +81,4 @@ app.listen(PORT, () => {
     console.log(`🚀 Сервер запущен на порту ${PORT}`);
     console.log(`✅ Система готова к работе!`);
 });
+
