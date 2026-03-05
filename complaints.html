@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>EKAKAMOV | Подача Жалоб (TG)</title>
+    <style>
+        :root { --primary: #8b0000; --accent: #ff0000; --bg: #050505; --card-bg: rgba(15, 15, 15, 0.98); --text: #ffffff; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; }
+        .bg-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% -20%, #440000 0%, #050505 80%); z-index: -1; }
+        nav { display: flex; justify-content: center; background: rgba(10, 10, 10, 0.9); padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 1000; }
+        nav a { color: #888; margin: 0 20px; text-decoration: none; font-weight: bold; font-size: 13px; text-transform: uppercase; }
+        .container { max-width: 650px; margin: 40px auto; padding: 0 15px; }
+        .complaint-form { background: var(--card-bg); padding: 35px; border-radius: 15px; border: 1px solid #222; box-shadow: 0 10px 50px rgba(0,0,0,0.8); }
+        .form-header { color: var(--accent); border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 25px; text-transform: uppercase; text-align: center; }
+        label { display: block; margin-bottom: 8px; font-size: 12px; color: #777; text-transform: uppercase; font-weight: bold; }
+        input, textarea { width: 100%; padding: 14px; margin-bottom: 20px; background: #0a0a0a; border: 1px solid #222; color: #fff; border-radius: 6px; box-sizing: border-box; }
+        .file-select { border: 2px dashed #333; padding: 30px; text-align: center; border-radius: 8px; cursor: pointer; margin-bottom: 25px; transition: 0.3s; }
+        .file-select.active { border-color: #2ecc71; background: rgba(46, 204, 113, 0.05); }
+        .btn-submit { background: var(--accent); color: #fff; border: none; padding: 18px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; border-radius: 6px; }
+        #loader { display: none; text-align: center; color: var(--accent); font-weight: bold; margin-top: 15px; padding: 10px; border: 1px solid var(--accent); }
+        .file-info { font-size: 13px; color: #aaa; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    <nav>
+        <a href="index.html">Главная</a>
+        <a href="members.html">Состав</a>
+        <a href="rules.html">Устав</a>
+        <a href="rankup.html">Повышение</a>
+        <a href="unwarn.html">Выговоры</a>
+        <a href="complaints.html">Отчет жалоб</a>
+        <a href="Bonus.html">Премиальная система</a>
+    </nav>
+
+    <div class="container">
+        <div class="complaint-form">
+            <h2 class="form-header">Подача жалобы</h2>
+            
+            <label>1. Ваш Nick Name:</label>
+            <input type="text" id="myNick" placeholder="Ivan_Ivanov">
+
+            <label>2. Nick Name нарушителя:</label>
+            <input type="text" id="targetNick" placeholder="Misha_Petrov">
+
+            <label>3. Суть нарушения (пункт устава):</label>
+            <textarea id="rule" rows="2" placeholder="Напр: 2.1 Устава (ТК)"></textarea>
+
+            <label>4. Доказательства (фото до 5 шт или 1 видео):</label>
+            <div class="file-select" id="dropZone" onclick="document.getElementById('hiddenFile').click()">
+                <span id="statusText">НАЖМИТЕ ДЛЯ ВЫБОРА ФАЙЛОВ</span>
+                <div class="file-info" id="fileCount">Выбрано: 0</div>
+                <input type="file" id="hiddenFile" accept="image/*,video/*" multiple hidden onchange="handleFiles(this)">
+            </div>
+
+            <button class="btn-submit" id="sendBtn" onclick="sendComplaint()">ОТПРАВИТЬ ЖАЛОБУ</button>
+            <div id="loader">🚀 ОТПРАВКА ДАННЫХ В ТЕЛЕГРАМ...</div>
+        </div>
+    </div>
+
+    <script>
+        const TG_TOKEN = "7922162882:AAFvx7yUn3sS-hkA6CwzSh1rcPFxPcSm71E"; 
+        const CHAT_IDS = ["2018168530", "8274600686"];
+        
+        let selectedFiles = [];
+
+        function handleFiles(input) {
+            selectedFiles = Array.from(input.files);
+            if(selectedFiles.length > 5 && selectedFiles[0].type.startsWith('image')) {
+                alert("Максимум 5 фото!");
+                selectedFiles = selectedFiles.slice(0, 5);
+            }
+            
+            document.getElementById('fileCount').innerText = "Выбрано файлов: " + selectedFiles.length;
+            document.getElementById('statusText').innerText = "✅ ФАЙЛЫ ГОТОВЫ";
+            document.getElementById('dropZone').classList.add('active');
+        }
+
+        async function sendComplaint() {
+            const myNick = document.getElementById('myNick').value;
+            const targetNick = document.getElementById('targetNick').value;
+            const rule = document.getElementById('rule').value;
+
+            if(!myNick || !targetNick || !rule || selectedFiles.length === 0) {
+                alert("Заполните все поля!"); return;
+            }
+
+            document.getElementById('sendBtn').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+
+            const text = `⚖️ **НОВАЯ ЖАЛОБА**\n\n👤 **Отправитель:** ${myNick}\n🚫 **Нарушитель:** ${targetNick}\n📝 **Суть:** ${rule}`;
+
+            try {
+                for (let chatId of CHAT_IDS) {
+                    for (let i = 0; i < selectedFiles.length; i++) {
+                        let file = selectedFiles[i];
+                        let formData = new FormData();
+                        formData.append("chat_id", chatId);
+                        
+                        // Если это первое сообщение — добавляем текст жалобы
+                        if (i === 0) {
+                            formData.append("caption", text);
+                            formData.append("parse_mode", "Markdown");
+                        }
+
+                        // Если картинка — шлем как фото, если видео — как документ
+                        if (file.type.startsWith('image')) {
+                            formData.append("photo", file);
+                            await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+                        } else {
+                            formData.append("document", file);
+                            await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendDocument`, { method: "POST", body: formData });
+                        }
+                    }
+                }
+                alert("✅ Жалоба успешно отправлена!");
+                location.reload();
+            } catch (e) {
+                alert("Ошибка при отправке!");
+                document.getElementById('sendBtn').style.display = 'block';
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

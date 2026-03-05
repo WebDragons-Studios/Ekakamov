@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>EKAKAMOV | Вступление в семью</title>
+    <style>
+        :root { --primary: #8b0000; --accent: #ff0000; --bg: #050505; --card-bg: rgba(15, 15, 15, 0.98); --text: #ffffff; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; }
+        .bg-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% -20%, #440000 0%, #050505 80%); z-index: -1; }
+        nav { display: flex; justify-content: center; background: rgba(10, 10, 10, 0.9); padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 1000; }
+        nav a { color: #888; margin: 0 20px; text-decoration: none; font-weight: bold; font-size: 13px; text-transform: uppercase; }
+        .container { max-width: 600px; margin: 40px auto; padding: 0 15px; }
+        .apply-form { background: var(--card-bg); padding: 35px; border-radius: 15px; border: 1px solid #222; box-shadow: 0 10px 50px rgba(0,0,0,0.8); }
+        .form-header { color: var(--accent); border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 25px; text-transform: uppercase; text-align: center; letter-spacing: 2px; }
+        label { display: block; margin-bottom: 8px; font-size: 12px; color: #777; text-transform: uppercase; font-weight: bold; }
+        input, select { width: 100%; padding: 14px; margin-bottom: 20px; background: #0a0a0a; border: 1px solid #222; color: #fff; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        .file-select { border: 2px dashed #333; padding: 25px; text-align: center; border-radius: 8px; cursor: pointer; margin-bottom: 25px; transition: 0.3s; }
+        .file-select.ready { border-color: #2ecc71; background: rgba(46, 204, 113, 0.05); }
+        .btn-submit { background: var(--accent); color: #fff; border: none; padding: 18px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; border-radius: 6px; transition: 0.3s; }
+        .btn-submit:hover { background: #ff1a1a; box-shadow: 0 0 20px rgba(255, 0, 0, 0.4); }
+        #loader { display: none; text-align: center; color: var(--accent); font-weight: bold; margin-top: 15px; }
+        .error-msg { color: #ff4d4d; font-size: 12px; margin-top: -15px; margin-bottom: 15px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+        <nav>
+        <a href="index.html">Главная</a>
+        <a href="members.html">Состав</a>
+        <a href="rules.html">Устав</a>
+        <a href="rankup.html">Повышение</a>
+        <a href="unwarn.html">Выговоры</a>
+        <a href="complaints.html">Отчет жалоб</a>
+        <a href="Bonus.html">Премиальная система</a>
+    </nav>
+
+    <div class="container">
+        <div class="apply-form">
+            <h2 class="form-header">Анкета кандидата</h2>
+            
+            <label>1. Ваш Nick Name:</label>
+            <input type="text" id="nick" placeholder="Ivan_Ivanov">
+
+            <label>2. Ваш игровой уровень:</label>
+            <input type="number" id="lvl" placeholder="Напр: 15">
+
+            <label>3. Сколько вам лет (ООС):</label>
+            <input type="number" id="age" placeholder="Минимум 13">
+            <div id="ageError" class="error-msg">❌ Извините, прием только с 13 лет.</div>
+
+            <label>4. Согласны сменить фамилию на Ekakamov?</label>
+            <select id="surnameChange">
+                <option value="">Выберите ответ...</option>
+                <option value="yes">Да, я согласен</option>
+                <option value="no">Нет, не согласен</option>
+            </select>
+            <div id="surnameError" class="error-msg">❌ Смена фамилии обязательна для вступления.</div>
+
+            <label>5. Фото игрового паспорта (/pass):</label>
+            <div class="file-select" id="dropZone" onclick="document.getElementById('hiddenFile').click()">
+                <span id="statusText">ЗАГРУЗИТЬ СКРИНШОТ ПАСПОРТА</span>
+                <input type="file" id="hiddenFile" accept="image/*" hidden onchange="handleFile(this)">
+            </div>
+
+            <label>6. Ваш Telegram (юз через @):</label>
+            <input type="text" id="tgLink" placeholder="@example_nick">
+
+            <button class="btn-submit" id="sendBtn" onclick="processApplication()">ОТПРАВИТЬ ЗАЯВКУ</button>
+            <div id="loader">⚙️ ПРОВЕРКА ДАННЫХ И ОТПРАВКА...</div>
+        </div>
+    </div>
+
+    <script>
+        const TG_TOKEN = "7922162882:AAFvx7yUn3sS-hkA6CwzSh1rcPFxPcSm71E"; 
+        const CHAT_IDS = ["2018168530", "8274600686"];
+        
+        let passportBlob = null;
+
+        function handleFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 1000;
+                    canvas.height = (img.height / img.width) * 1000;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob((blob) => {
+                        passportBlob = blob;
+                        document.getElementById('statusText').innerText = "✅ ПАСПОРТ ЗАГРУЖЕН";
+                        document.getElementById('dropZone').classList.add('ready');
+                    }, 'image/jpeg', 0.8);
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function processApplication() {
+            const nick = document.getElementById('nick').value;
+            const lvl = document.getElementById('lvl').value;
+            const age = parseInt(document.getElementById('age').value);
+            const surname = document.getElementById('surnameChange').value;
+            const tg = document.getElementById('tgLink').value;
+
+            // Сброс ошибок
+            document.getElementById('ageError').style.display = 'none';
+            document.getElementById('surnameError').style.display = 'none';
+
+            // Проверки
+            if (!nick || !lvl || !tg || !passportBlob) {
+                alert("Пожалуйста, заполните все поля и загрузите фото паспорта!");
+                return;
+            }
+
+            if (age < 13) {
+                document.getElementById('ageError').style.display = 'block';
+                return;
+            }
+
+            if (surname !== 'yes') {
+                document.getElementById('surnameError').style.display = 'block';
+                return;
+            }
+
+            if (!tg.startsWith('@')) {
+                alert("ТГ должен начинаться с @");
+                return;
+            }
+
+            // Отправка
+            document.getElementById('sendBtn').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+
+            const message = `🧨 **НОВАЯ ЗАЯВКА В СЕМЬЮ**\n\n👤 **Ник:** ${nick}\n📊 **Уровень:** ${lvl}\n🎂 **Возраст:** ${age}\n🆔 **Смена фамилии:** Согласен\n✈️ **Telegram:** ${tg}`;
+
+            try {
+                for (let chatId of CHAT_IDS) {
+                    let formData = new FormData();
+                    formData.append("chat_id", chatId);
+                    formData.append("caption", message);
+                    formData.append("parse_mode", "Markdown");
+                    formData.append("photo", passportBlob, "pass.jpg");
+                    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+                }
+                alert("✅ Ваша заявка отправлена! Ожидайте ответа в Telegram.");
+                window.location.href = "index.html";
+            } catch (e) {
+                alert("Ошибка при отправке. Попробуйте позже.");
+                document.getElementById('sendBtn').style.display = 'block';
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

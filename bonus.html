@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>EKAKAMOV | Система Премий</title>
+    <style>
+        :root { --primary: #8b0000; --accent: #ff0000; --bg: #050505; --card-bg: rgba(15, 15, 15, 0.98); --text: #ffffff; --money: #2ecc71; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        .bg-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% -20%, #440000 0%, #050505 80%); z-index: -1; }
+        
+        nav { display: flex; justify-content: center; flex-wrap: wrap; background: rgba(10, 10, 10, 0.9); padding: 15px; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 1000; }
+        nav a { color: #888; margin: 5px 15px; text-decoration: none; font-weight: bold; font-size: 13px; text-transform: uppercase; transition: 0.3s; }
+        nav a:hover { color: var(--money); }
+
+        .main-wrapper { display: flex; max-width: 1300px; margin: 40px auto; gap: 30px; padding: 0 20px; align-items: flex-start; }
+        
+        .rules-side { flex: 1.2; background: var(--card-bg); padding: 25px; border-radius: 15px; border: 1px solid #222; height: 750px; overflow-y: scroll; scrollbar-width: thin; scrollbar-color: var(--money) #111; }
+        .rules-side::-webkit-scrollbar { width: 6px; }
+        .rules-side::-webkit-scrollbar-thumb { background: var(--money); border-radius: 10px; }
+        .rules-side h3 { color: var(--money); text-transform: uppercase; border-bottom: 1px solid var(--money); padding-bottom: 10px; margin-top: 0; position: sticky; top: 0; background: var(--card-bg); z-index: 5; }
+        
+        .rule-category { color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; margin: 20px 0 10px 0; border-left: 3px solid var(--primary); padding-left: 10px; }
+        .rule-item { margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 8px; transition: 0.2s; }
+        .rule-item:hover { border-color: var(--money); }
+        .rule-name { display: block; font-weight: bold; color: #eee; font-size: 14px; }
+        .rule-price { color: var(--money); font-size: 13px; font-weight: bold; }
+
+        .bonus-form { flex: 1; background: var(--card-bg); padding: 30px; border-radius: 15px; border: 1px solid #222; box-shadow: 0 0 30px rgba(0,0,0,0.5); position: sticky; top: 100px; }
+        
+        label { display: block; margin-bottom: 5px; font-size: 11px; color: #666; text-transform: uppercase; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; border: 1px solid #222; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        .file-btn { border: 2px dashed #333; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; margin-bottom: 15px; color: #888; transition: 0.3s; font-size: 12px; }
+        .file-btn:hover { border-color: var(--money); color: #fff; }
+        .btn-gold { background: var(--money); color: #000; border: none; padding: 18px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; border-radius: 6px; font-size: 14px; transition: 0.3s; }
+        .btn-gold:hover { background: #27ae60; transform: scale(1.02); }
+        
+        #loader { display: none; text-align: center; color: var(--money); font-weight: bold; margin-top: 15px; border: 1px solid var(--money); padding: 10px; border-radius: 5px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
+
+        @media (max-width: 1000px) {
+            .main-wrapper { flex-direction: column; }
+            .rules-side { width: 100%; height: 400px; order: 2; }
+            .bonus-form { width: 100%; order: 1; position: static; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+      <nav>
+        <a href="index.html">Главная</a>
+        <a href="members.html">Состав</a>
+        <a href="rules.html">Устав</a>
+        <a href="rankup.html">Повышение</a>
+        <a href="unwarn.html">Выговоры</a>
+        <a href="complaints.html">Отчет жалоб</a>
+        <a href="Bonus.html">Премиальная система</a>
+    </nav>
+
+   <div class="main-wrapper">
+        <div class="rules-side">
+            <h3>Прайс-лист активностей</h3>
+            
+            <div class="rule-category">Боевые заслуги</div>
+            <div class="rule-item"><span class="rule-name">🛡️ Защита Лидера (спасение)</span><span class="rule-price">20,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🎯 Ликвидация врага фамы</span><span class="rule-price">20,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🚓 Помощь в побеге из ТСР</span><span class="rule-price">30,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🦾 Участие в ГРП</span><span class="rule-price">40,000 руб.</span></div>
+
+            <div class="rule-category">Хозяйство и Склад</div>
+            <div class="rule-item"><span class="rule-name">🛠️ Закупка ремкомплектов (10шт)</span><span class="rule-price">10,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🩹 Пополнение аптечек (20шт)</span><span class="rule-price">15,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🧱 Поставка бронежилетов (20шт)</span><span class="rule-price">25,000 руб.</span></div>
+
+            <div class="rule-category">Развитие и Пиар</div>
+            <div class="rule-item"><span class="rule-name">🤝 Приглашение друга (3 лвл)</span><span class="rule-price">20,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">💬 Реклама в  /s чат</span><span class="rule-price">3,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🎓 Обучение новичка (устав)</span><span class="rule-price">10,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🎥 Создание видео/мувика</span><span class="rule-price">50,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">📸 Красивое фото состава</span><span class="rule-price">5,000 руб.</span></div>
+
+            <div class="rule-category">Активность</div>
+            <div class="rule-item"><span class="rule-name">Топ 1 по онлайну</span><span class="rule-price">40,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🏆 Топ рейтинга недели</span><span class="rule-price">100,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🌙 Ночной дозор (00-05:00)</span><span class="rule-price">30,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🎭 Отыгрыш РП-ситуации</span><span class="rule-price">15,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🎙️ Актив в Discord (3ч+)</span><span class="rule-price">10,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🎂 День Рождения</span><span class="rule-price">50,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🔥 Рекорд онлайна за день</span><span class="rule-price">25,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">🕵️ Разведка вражеской базы</span><span class="rule-price">10,000 руб.</span></div>
+            <div class="rule-item"><span class="rule-name">✨ Верность (месяц без выговоров)</span><span class="rule-price">50,000 руб.</span></div>
+        </div>
+
+        <div class="bonus-form">
+            <h2 style="color:var(--money); text-align:center; margin-top:0; letter-spacing: 2px;">ОТЧЕТ НА ВЫПЛАТУ</h2>
+            
+            <label>Ваш Nick_Name:</label>
+            <input type="text" id="nick" placeholder="Ivan_Ivanov">
+
+            <label>Паспорт:</label>
+            <div class="file-btn" onclick="document.getElementById('fDoc').click()" id="bDoc">ПРИКРЕПИТЬ ПАСПОРТ</div>
+            <input type="file" id="fDoc" accept="image/*" hidden onchange="preview(this, 'bDoc')">
+
+            <label>Банковский счет:</label>
+            <input type="text" id="bank" placeholder="Счет или телефон">
+
+            <label>Тип работы:</label>
+             <select id="task">
+                <optgroup label="Боевые">
+                    <option>Защита Лидера</option>
+                    <option>Ликвидация врага фамы</option>
+                    <option>Помощь в побеге из ТСР</option>
+                    <option>Участие в ГРП</option>
+                </optgroup>
+                <optgroup label="Склад и Хозяйство">
+                    <option>Закупка ремкомплектов</option>
+                    <option>Пополнение аптечек</option>
+                    <option>Поставка бронежилетов</option>
+                </optgroup>
+                <optgroup label="Пиар и Развитие">
+                    <option>Приглашение друга</option>
+                    <option>Реклама в /s чат</option>
+                    <option>Обучение новичка</option>
+                    <option>Создание мувика/видео</option>
+                    <option>Красивое фото состава</option>
+                </optgroup>
+                <optgroup label="Активность">
+                    <option>Топ-1 по онлайну</option>
+                    <option>Топ рейтинга недели</option>
+                    <option>Ночной дозор</option>
+                    <option>Отыгрыш РП-ситуации</option>
+                    <option>Актив в Discord</option>
+                    <option>День Рождения</option>
+                    <option>Рекорд онлайна за день</option>
+                    <option>Разведка вражеской базы</option>
+                    <option>Верность (месяц без выговоров)</option>
+                </optgroup>
+            </select>
+
+            <label>Ссылка на видео (необязательно):</label>
+            <input type="text" id="videoLink" placeholder="YouTube / Imgur / YouTube Shorts">
+
+            <label>Фото доказательства (макс. 10):</label>
+            <div class="file-btn" onclick="document.getElementById('fWork').click()" id="bWork">ЗАГРУЗИТЬ СКРИНШОТЫ (МАКС 10)</div>
+            <input type="file" id="fWork" accept="image/*" hidden multiple onchange="previewMultiple(this, 'bWork')">
+
+            <button class="btn-gold" id="sendBtn" onclick="sendToTelegram()">ОТПРАВИТЬ ОТЧЕТ</button>
+            <div id="loader">🚀 ОТПРАВКА ДАННЫХ...</div>
+        </div>
+    </div>
+
+    <script>
+        const TG_TOKEN = "7922162882:AAFvx7yUn3sS-hkA6CwzSh1rcPFxPcSm71E"; 
+        const CHAT_IDS = ["2018168530", "8274600686"]; 
+
+        function preview(input, btnId) {
+            if (input.files[0]) {
+                document.getElementById(btnId).innerText = "✅ ПАСПОРТ ВЫБРАН";
+                document.getElementById(btnId).style.borderColor = "#2ecc71";
+            }
+        }
+
+        function previewMultiple(input, btnId) {
+            const count = input.files.length;
+            if (count > 10) {
+                alert("Можно выбрать не более 10 фото!");
+                input.value = "";
+                document.getElementById(btnId).innerText = "ЗАГРУЗИТЬ СКРИНШОТЫ (МАКС 10)";
+                return;
+            }
+            if (count > 0) {
+                document.getElementById(btnId).innerText = `✅ ВЫБРАНО ФОТО: ${count}`;
+                document.getElementById(btnId).style.borderColor = "#2ecc71";
+            }
+        }
+
+        async function sendToTelegram() {
+            const nick = document.getElementById('nick').value;
+            const bank = document.getElementById('bank').value;
+            const task = document.getElementById('task').value;
+            const video = document.getElementById('videoLink').value;
+            const fileDoc = document.getElementById('fDoc').files[0];
+            const workFiles = document.getElementById('fWork').files;
+
+            if (!nick || !bank || !fileDoc || workFiles.length === 0) {
+                alert("Заполните Nick, счет и прикрепите фото (паспорт + работа)!");
+                return;
+            }
+
+            document.getElementById('sendBtn').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+
+            const videoText = video ? `\n🎥 **Видео:** ${video}` : "";
+            const message = `💰 **НОВЫЙ ОТЧЕТ [EKAKAMOV]**\n\n👤 **Игрок:** ${nick}\n📋 **Задание:** ${task}\n💳 **Счет:** ${bank}${videoText}`;
+
+            try {
+                for (let chatId of CHAT_IDS) {
+                    // 1. Отправляем паспорт
+                    let f1 = new FormData();
+                    f1.append("chat_id", chatId);
+                    f1.append("caption", message);
+                    f1.append("parse_mode", "Markdown");
+                    f1.append("photo", fileDoc);
+                    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendPhoto`, { method: "POST", body: f1 });
+
+                    // 2. Отправляем пачку фото (MediaGroup)
+                    if (workFiles.length > 0) {
+                        let fGroup = new FormData();
+                        fGroup.append("chat_id", chatId);
+                        let media = [];
+                        
+                        for (let i = 0; i < workFiles.length; i++) {
+                            const fileId = `img${i}`;
+                            fGroup.append(fileId, workFiles[i]);
+                            media.push({ type: 'photo', media: `attach://${fileId}` });
+                        }
+                        
+                        fGroup.append("media", JSON.stringify(media));
+                        await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMediaGroup`, { method: "POST", body: fGroup });
+                    }
+                }
+                alert("✅ ОТЧЕТ ОТПРАВЛЕН!");
+                location.reload();
+            } catch (e) {
+                alert("Ошибка! Попробуйте еще раз.");
+                document.getElementById('sendBtn').style.display = 'block';
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Управление семьей | Ekakamov</title>
+    <style>
+        body { background: #050505; color: #fff; font-family: sans-serif; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .form-card { background: #111; padding: 20px; border-radius: 10px; border: 1px solid #8b0000; margin-bottom: 30px; }
+        h2 { color: #ff0000; text-transform: uppercase; text-align: center; }
+        input, select, button { padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #333; background: #000; color: #fff; }
+        .btn-add { background: #8b0000; cursor: pointer; border: none; font-weight: bold; width: 100%; margin-top: 10px; }
+        
+        table { width: 100%; border-collapse: collapse; background: #111; border-radius: 10px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #222; }
+        th { background: #8b0000; color: #fff; }
+        
+        .warn-btn { background: #333; border: 1px solid #444; cursor: pointer; padding: 2px 8px; margin: 0 2px; font-weight: bold; }
+        .warn-btn:hover { background: #ff0000; }
+        .btn-edit { background: #2196F3; border: none; cursor: pointer; padding: 5px 10px; }
+        .btn-del { background: #f44336; border: none; cursor: pointer; padding: 5px 10px; }
+        .status-online { color: lime; }
+        .status-offline { color: red; }
+        .warn-count { font-weight: bold; color: #ffeb3b; display: inline-block; width: 30px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-card">
+            <h2>Добавить / Изменить участника</h2>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+                <input type="password" id="pass" placeholder="Пароль админа" style="width: 95%;">
+                <input type="text" id="name" placeholder="Ник игрока">
+                <select id="rank">
+                    <option value="[10] Глава">Глава [10]</option>
+                    <option value="[9] Зам. Главы">Зам. Главы [9]</option>
+                    <option value="[8] Гольд">Гольд [8]</option>
+                    <option value="[7] Шерх">Шерх [7]</option>
+                    <option value="[6] Элит">Элит [6]</option>
+                    <option value="[5] Ветеран">Ветеран [5]</option>
+                    <option value="[4] Боец">Боец [4]</option>
+                    <option value="[3] Новичок+">Новичок+ [3]</option>
+                    <option value="[2] Равк">Равк [2]</option>
+                    <option value="[1] Кандидат">Кандидат [1]</option>
+                </select>
+                <input type="number" id="warns" placeholder="Выговоры" value="0" style="width: 80px;">
+                <select id="online">
+                    <option value="false">Оффлайн</option>
+                    <option value="true">В игре</option>
+                </select>
+                <button class="btn-add" onclick="saveMember()">СОХРАНИТЬ В БАЗУ</button>
+            </div>
+        </div>
+
+        <h2>Текущий состав</h2>
+        <table id="memberTable">
+            <thead>
+                <tr>
+                    <th>Ник</th>
+                    <th>Ранг</th>
+                    <th>Выговоры</th>
+                    <th>Статус</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadMembers() {
+            const res = await fetch('/admin/get-members');
+            const members = await res.json();
+            const tbody = document.querySelector('#memberTable tbody');
+            tbody.innerHTML = '';
+
+            members.forEach(m => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${m.name}</b></td>
+                        <td>${m.rank}</td>
+                        <td>
+                            <button class="warn-btn" onclick="changeWarns('${m.name}', -1)">-</button>
+                            <span class="warn-count">${m.warns || 0}</span>
+                            <button class="warn-btn" onclick="changeWarns('${m.name}', 1)">+</button>
+                        </td>
+                        <td class="${m.online ? 'status-online' : 'status-offline'}">${m.online ? 'В игре' : 'Оффлайн'}</td>
+                        <td>
+                            <button class="btn-edit" onclick="fillForm('${m.name}', '${m.rank}', ${m.warns}, ${m.online})">📝</button>
+                            <button class="btn-del" onclick="deleteMember('${m.name}')">❌</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function changeWarns(name, delta) {
+            const password = document.getElementById('pass').value;
+            if(!password) return alert("Введите пароль админа сверху!");
+
+            const res = await fetch('/admin/update-warns', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ password, name, delta })
+            });
+
+            if(res.ok) {
+                loadMembers();
+            } else {
+                alert("Ошибка! Проверь пароль.");
+            }
+        }
+
+       function fillForm(name, rank, warns, online) {
+    document.getElementById('name').value = name;
+    document.getElementById('rank').value = rank;
+    document.getElementById('warns').value = warns;
+    // Важно: приводим к строке, чтобы select выбрал нужный option
+    document.getElementById('online').value = online.toString();
+    window.scrollTo(0,0);
+}
+        async function saveMember() {
+            const data = {
+                password: document.getElementById('pass').value,
+                name: document.getElementById('name').value,
+                rank: document.getElementById('rank').value,
+                warns: parseInt(document.getElementById('warns').value),
+                online: document.getElementById('online').value === "true"
+            };
+
+            const res = await fetch('/admin/update-member', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+
+            if(res.ok) { loadMembers(); } else { alert("Ошибка!"); }
+        }
+
+        async function deleteMember(name) {
+            const password = document.getElementById('pass').value;
+            if(!password) return alert("Введите пароль админа!");
+            if(!confirm(`Уволить ${name}?`)) return;
+
+            const res = await fetch('/admin/delete-member', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({password, name})
+            });
+            if(res.ok) { loadMembers(); }
+        }
+
+        loadMembers();
+    </script>
+</body>
+</html>

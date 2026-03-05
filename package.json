@@ -1,0 +1,13 @@
+{
+  "name": "ekakamov-admin",
+  "version": "1.0.0",
+  "description": "Family Admin Panel",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.1",
+    "mongoose": "^7.8.9"
+  }
+}

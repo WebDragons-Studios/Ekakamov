@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekakamov Family | Главная</title>
+    <style>
+        :root {
+            --primary: #8b0000;
+            --accent: #ff0000;
+            --bg: #050505;
+            --card-bg: rgba(20, 20, 20, 0.6);
+            --text: #ffffff;
+            --text-dim: #888;
+        }
+
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; 
+            overflow-x: hidden;
+        }
+
+        /* Динамический фон */
+        .bg-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% -20%, #440000 0%, #050505 80%);
+            z-index: -1;
+        }
+
+        /* Шапка с эффектом размытия */
+        nav { 
+            display: flex; 
+            justify-content: center; 
+            flex-wrap: wrap;
+            background: rgba(5, 5, 5, 0.8); 
+            padding: 20px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav a { 
+            color: var(--text-dim); 
+            margin: 5px 15px; 
+            text-decoration: none; 
+            font-weight: 600; 
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        nav a:hover, nav a.active { 
+            color: var(--accent); 
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+        }
+
+        /* Герой-секция */
+        header { 
+            padding: 60px 20px 40px; 
+            text-align: center; 
+        }
+
+        /* КОНТЕЙНЕР ЛОГОТИПА */
+        .logo-wrapper {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 150px; /* Размер фото */
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%; /* Делает круглым */
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 25px rgba(139, 0, 0, 0.6);
+            transition: 0.5s ease;
+        }
+
+        .logo-img:hover {
+            transform: scale(1.05) rotate(3deg);
+            border-color: var(--accent);
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.8);
+        }
+
+        .family-logo-text {
+            font-size: 14px;
+            letter-spacing: 8px;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: block;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .hero-title { 
+            font-size: clamp(3rem, 10vw, 5.5rem); 
+            margin: 0;
+            font-weight: 900;
+            background: linear-gradient(180deg, #fff 0%, #555 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            line-height: 0.9;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 4vw, 1.25rem);
+            color: var(--text-dim);
+            max-width: 700px;
+            margin: 30px auto;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        /* Кнопка */
+        .cta-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 20px 50px;
+            background: var(--accent);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 2px;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+            transition: 0.4s;
+            box-shadow: 20px 0 50px rgba(255, 0, 0, 0.2);
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05) skewX(-5deg);
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Карточки */
+        .content { max-width: 1200px; margin: 0 auto; padding: 60px 20px; }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 80px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 50px 40px;
+            border-radius: 4px;
+            text-align: left;
+            transition: 0.5s;
+            position: relative;
+        }
+
+        .feature-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 2px; height: 0;
+            background: var(--accent);
+            transition: 0.5s;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-15px);
+            border-color: rgba(255, 0, 0, 0.3);
+        }
+
+        .feature-card:hover::before { height: 100%; }
+
+        .feature-card h3 {
+            color: #fff;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+
+        .feature-card p {
+            color: var(--text-dim);
+            line-height: 1.7;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        /* Подвал */
+        footer {
+            margin-top: 100px;
+            padding: 60px 20px;
+            background: #030303;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .footer-copy {
+            color: #333;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feature-card { animation: fadeInUp 0.8s ease backwards; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.4s; }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+
+    <nav>
+        <a href="index.html" class="active">Главная</a>
+        <a href="members.html">Состав</a>
+        <a href="rules.html">Устав</a>
+        <a href="rankup.html">Повышение</a>
+        <a href="unwarn.html">Выговоры</a>
+        <a href="complaints.html">Отчет жалоб</a>
+        <a href="Bonus.html">Премиальная система</a>
+        <a href="admin.html">Админ Панель</a>
+    </nav>
+
+    <header>
+        <div class="logo-wrapper">
+            <img src="Foto/5424807414886167331.jpg" alt="EKAKAMOV LOGO" class="logo-img">
+        </div>
+
+        
+        <h1 class="hero-title">EKAKAMOV<br>FAMILY</h1>
+        <p class="hero-subtitle">Мы не просто фама. Мы — кодекс чести в мире хаоса. Здесь преданность ценится выше золота, а слово брата является законом.</p>
+        <a href="apply.html" class="cta-button">Вступить в ряды</a>
+    </header>
+
+    <div class="content">
+        <div class="features">
+            <div class="feature-card">
+                <h3>01. Братство</h3>
+                <p>Единство — наша главная сила. Мы никогда не оставляем своих. Каждый член семьи защищен мощью всего клана.</p>
+            </div>
+            <div class="feature-card">
+                <h3>02. Влияние</h3>
+                <p>Наши интересы простираются за границы видимого. Мы контролируем порядок и диктуем свои условия там, где другие подчиняются.</p>
+            </div>
+            <div class="feature-card">
+                <h3>03. Дисциплина</h3>
+                <p>Строгая иерархия и беспрекословное выполнение устава. Это то, что отличает элиту от толпы.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-copy">
+            &copy; 2026 EKAKAMOV FAMILY. PROTECTED BY CODE OF HONOR.
+        </div>
+    </footer>
+
+</body>
+</html>
