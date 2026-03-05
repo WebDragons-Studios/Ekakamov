@@ -6,14 +6,12 @@ const app = express();
 app.use(express.json());
 app.use(express.static(__dirname));
 
+// Твоя проверенная строка подключения
 const mongoURI = "mongodb+srv://admin:pass12345@cluster0.yxx1kto.mongodb.net/familyDB?retryWrites=true&w=majority";
 
 console.log("⏳ Пытаюсь подключиться к MongoDB...");
 
-mongoose.connect(mongoURI, {
-    serverSelectionTimeoutMS: 10000, // Ждем максимум 10 секунд
-    family: 4 // Принудительно используем IPv4 (часто помогает при кривых настройках провайдера)
-})
+mongoose.connect(mongoURI)
 .then(() => {
     console.log("✅✅✅ БАЗА ПОДКЛЮЧЕНА! СВЯЗЬ УСТАНОВЛЕНА!");
 })
@@ -21,7 +19,6 @@ mongoose.connect(mongoURI, {
     console.log("❌ ОШИБКА ПОДКЛЮЧЕНИЯ К БАЗЕ:");
     console.error(err.message);
     console.log("-----------------------------------------");
-    console.log("СОВЕТ: Если видишь 'timeout', раздай интернет с ТЕЛЕФОНА и перезапусти сервер.");
 });
 
 const Member = mongoose.model('Member', new mongoose.Schema({
@@ -79,13 +76,9 @@ app.get('/get-statuses', async (req, res) => {
     }
 });
 
-const PORT = 3000;
+// ВАЖНО: Настройка порта для Render
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Сервер взлетел на порту ${PORT}`);
-    console.log(`🔗 Админка: http://localhost:${PORT}/admin.html`);
-
+    console.log(`🚀 Сервер запущен на порту ${PORT}`);
+    console.log(`✅ Система готова к работе!`);
 });
-
-
-
-
