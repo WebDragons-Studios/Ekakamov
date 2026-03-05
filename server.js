@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static(__dirname));
 
-const mongoURI = "mongodb://mrgarderreddragon_db_user:RedDragon2028@cluster0-shard-00-00.yxx1kto.mongodb.net:27017,cluster0-shard-00-01.yxx1kto.mongodb.net:27017,cluster0-shard-00-02.yxx1kto.mongodb.net:27017/familyDB?ssl=true&replicaSet=atlas-yxx1kto-shard-0&authSource=admin&retryWrites=true&w=majority";
+const mongoURI = "mongodb+srv://admin:pass12345@cluster0.yxx1kto.mongodb.net/familyDB?retryWrites=true&w=majority";
 
 console.log("⏳ Пытаюсь подключиться к MongoDB...");
 
@@ -85,5 +85,6 @@ app.listen(PORT, () => {
     console.log(`🔗 Админка: http://localhost:${PORT}/admin.html`);
 
 });
+
 
 
