@@ -8,7 +8,6 @@ app.use(express.static(__dirname));
 
 // Твоя проверенная строка подключения
 const mongoURI = "mongodb+srv://admin:pass12345@cluster0.yxx1kto.mongodb.net/familyDB?retryWrites=true&w=majority";
-
 console.log("⏳ Пытаюсь подключиться к MongoDB...");
 
 mongoose.connect(mongoURI)
